@@ -60,7 +60,7 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
   async openLink() {
     try {
       await InAppBrowser.isAvailable()
-      InAppBrowser.open('https://www.google.com', {
+      const result = await InAppBrowser.open('https://www.google.com', {
         // iOS Properties
         dismissButtonStyle: 'cancel',
         preferredBarTintColor: 'gray',
@@ -84,9 +84,8 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
         headers: {
           'my-custom-header': 'my custom header value'
         },
-      }).then((result) => {
-        Alert.alert(JSON.stringify(result))
-      })
+      });
+      Alert.alert(JSON.stringify(result));
     } catch (error) {
       Alert.alert(error.message)
     }
@@ -203,15 +202,41 @@ The StatusBar will keep the last one provided in your app. So if the StatusBar i
   })
 ```
 
+If you need to restore the old bar style, after the browser is dismissed, you can try and patch the StatusBar.setBarStyle function to store the old value like so:
+
+```js
+// patch StatusBar.setBarStyle to make style accessible
+const _setBarStyle = StatusBar.setBarStyle;
+StatusBar.setBarStyle = (style) => {
+	StatusBar.currentStyle = style;
+	_setBarStyle(style);
+};
+```
+
+You can than restore the old bar style after the browser has been dismissed like this: 
+
+```javascript
+  async openInBrowser(url) {
+    try {
+      const oldStyle = StatusBar.currentStyle
+      StatusBar.setBarStyle('dark-content')
+      await InAppBrowser.open(url)
+      if(oldStyle) StatusBar.setBarStyle(oldStyle)
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  })
+```
+
 ## Credits 👍
 * **Expo:** [WebBrowser](https://docs.expo.io/versions/latest/sdk/webbrowser)
 * **React Native Custom Tabs:** [Chrome Custom Tabs for React Native](https://github.com/droibit/react-native-custom-tabs)
 * **React Native Safari View:** [A React Native wrapper for Safari View Controller](https://github.com/naoufal/react-native-safari-view)
 
 ## Collaborators 🥇
-[<img alt="jdnichollsc" src="https://avatars3.githubusercontent.com/u/2154886?v=3&s=117" width="117">](https://github.com/jdnichollsc) | [<img alt="EQuimper" src="https://avatars3.githubusercontent.com/u/15819498?v=4&s=117" width="117">](https://github.com/EQuimper) | [<img alt="bonesyblue" src="https://avatars3.githubusercontent.com/u/7486722?s=460&v=4&s=117" width="117">](https://github.com/bonesyblue) | [<img alt="mlazari" src="https://avatars3.githubusercontent.com/u/4928274?v=4&s=117" width="117">](https://github.com/mlazari) | [<img alt="maestor" src="https://avatars3.githubusercontent.com/u/3604902?v=4&s=117" width="117">](https://github.com/maestor)
-:---: | :---: |:---: | :---: | :---: |
-[Juan Nicholls](mailto:jdnichollsc@hotmail.com) | [Emanuel Quimper](mailto:quimperemanuel@gmail.com) | [Jonathan Bones](mailto:bonesyblue@gmail.com) | [Mihai Lazari](https://github.com/mlazari) | [Kalle Haavisto](mailto:maestori@gmail.com)
+[<img alt="jdnichollsc" src="https://avatars3.githubusercontent.com/u/2154886?v=3&s=117" width="117">](https://github.com/jdnichollsc) | [<img alt="EQuimper" src="https://avatars3.githubusercontent.com/u/15819498?v=4&s=117" width="117">](https://github.com/EQuimper) | [<img alt="bonesyblue" src="https://avatars3.githubusercontent.com/u/7486722?s=460&v=4&s=117" width="117">](https://github.com/bonesyblue) | [<img alt="mlazari" src="https://avatars3.githubusercontent.com/u/4928274?v=4&s=117" width="117">](https://github.com/mlazari) | [<img alt="maestor" src="https://avatars3.githubusercontent.com/u/3604902?v=4&s=117" width="117">](https://github.com/maestor) | [<img alt="plamworapot" src="https://avatars3.githubusercontent.com/u/4770354?v=4&s=117" width="117">](https://github.com/plamworapot) | [<img alt="adammcarth" src="https://avatars3.githubusercontent.com/u/3016455?v=4&s=117" width="117">](https://github.com/adammcarth) | [<img alt="SnaiNeR" src="https://avatars0.githubusercontent.com/u/39980963?v=4&s=117" width="117">](https://github.com/SnaiNeR)
+:---: | :---: |:---: | :---: | :---: | :---: | :---: | :---: |
+[Juan Nicholls](mailto:jdnichollsc@hotmail.com) | [Emanuel Quimper](mailto:quimperemanuel@gmail.com) | [Jonathan Bones](mailto:bonesyblue@gmail.com) | [Mihai Lazari](https://github.com/mlazari) | [Kalle Haavisto](mailto:maestori@gmail.com) | [Worapot Pengsuk](https://github.com/plamworapot) | [Adam McArthur](mailto:adam@adammcarthur.net) | [Artem Emelyanov](mailto:snainer@gmail.com)
 
 ## Supporting 🍻
 I believe in Unicorns 🦄
@@ -220,4 +245,4 @@ Support [me](http://www.paypal.me/jdnichollsc/2), if you do too.
 ## Happy coding 💯
 Made with ❤️
 
-<img width="150px" src="http://phaser.azurewebsites.net/assets/nicholls.png" align="right">
+<img width="150px" src="https://avatars0.githubusercontent.com/u/28855608?s=200&v=4" align="right">
